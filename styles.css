@@ -1,53 +1,81 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to right, #f9c74f, #f9a825);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
     margin: 0;
-    padding: 0;
 }
 
-.container {
+.welcome-page {
     text-align: center;
-    padding: 20px;
 }
 
-header {
-    background-color: #2E3B4E;
+.flashy-text {
+    font-size: 3em;
+    animation: flash 1s infinite alternate;
     color: white;
-    padding: 15px;
-    border-radius: 10px;
 }
 
-h1 {
-    font-size: 36px;
-    margin-bottom: 20px;
+@keyframes flash {
+    0% {
+        color: #ff6347;
+    }
+    100% {
+        color: #4b9cd3;
+    }
 }
 
-h2 {
-    font-size: 28px;
-    margin: 20px 0;
-}
-
-.start-button {
+button {
     padding: 10px 20px;
-    font-size: 18px;
-    cursor: pointer;
-    background-color: #4CAF50;
+    font-size: 1.2em;
+    margin-top: 20px;
+    background-color: #ff6347;
     color: white;
     border: none;
-    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #4b9cd3;
+}
+
+.ready-page {
+    text-align: center;
+    margin-top: 20%;
+}
+
+.congratulations-page {
+    text-align: center;
+    background-color: #f9c74f;
+    padding: 50px;
+}
+
+.confetti-animation {
+    /* This can be a fun confetti animation using libraries or CSS effects */
+    animation: confetti 3s ease-in-out infinite;
+}
+
+@keyframes confetti {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+button {
+    padding: 15px 30px;
+    font-size: 1.2em;
+    background-color: #4b9cd3;
+    color: white;
+    border: none;
+    cursor: pointer;
     margin-top: 20px;
-    transition: background-color 0.3s ease;
 }
 
-.start-button:hover {
-    background-color: #45a049;
-}
-
-section {
-    margin-top: 20px;
-}
-
-.celebrate p {
-    font-size: 24px;
-    color: #2E3B4E;
+button:hover {
+    background-color: #ff6347;
 }
