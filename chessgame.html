@@ -1,60 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chess Game</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chess.js@0.10.2/dist/chess.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JavaScript Chess Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    #chessboard {
+      display: grid;
+      grid-template-columns: repeat(8, 60px);
+      grid-template-rows: repeat(8, 60px);
+      border: 3px solid #333;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    .square {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 40px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .light { background-color: #f0d9b5; }
+    .dark { background-color: #b58863; }
+    .selected { background-color: rgba(0, 255, 0, 0.5) !important; }
+    .valid-move { background-color: rgba(0, 0, 255, 0.3) !important; cursor: pointer; }
+    #status { margin-top: 20px; font-size: 1.2em; font-weight: bold; }
+    #controls { margin-top: 20px; }
+    button { padding: 8px 16px; font-size: 1em; cursor: pointer; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Let’s Play Chess!</h1>
-        </header>
+  <h1>JavaScript Chess</h1>
+  <div id="chessboard"></div>
+  <div id="status">White's turn</div>
+  <div id="controls">
+    <button id="reset">New Game</button>
+  </div>
 
-        <section class="game">
-            <div id="board1" style="width: 400px"></div>
-            <button onclick="startNewGame()" class="start-button">START A NEW GAME</button>
-        </section>
-    </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const boardElement = document.getElementById('chessboard');
+      const statusElement = document.getElementById('status');
+      const resetButton = document.getElementById('reset');
 
-    <script>
-        var board = Chessboard('board1', {
-            draggable: true,
-            dropOffBoard: 'trash',
-            sparePieces: true
-        });
-        var game = new Chess();
+      let board = [];
+      let selectedPiece = null;
+      let currentPlayer = 'white';
+      let validMoves = [];
 
-        board.start();
+      function initGame() {
+        board = [
+          ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'],
+          ['♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'],
+          ['', '', '', '', '', '', '', ''],
+          ['', '', '', '', '', '', '', ''],
+          ['', '', '', '', '', '', '', ''],
+          ['', '', '', '', '', '', '', ''],
+          ['♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'],
+          ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖']
+        ];
+        currentPlayer = 'white';
+        selectedPiece = null;
+        validMoves = [];
+        statusElement.textContent = "White's turn";
+        renderBoard();
+      }
 
-        function startNewGame() {
-            game.reset();
-            board.start();
+      function renderBoard() {
+        boardElement.innerHTML = '';
+        for (let row = 0; row < 8; row++) {
+          for (let col = 0; col < 8; col++) {
+            const square = document.createElement('div');
+            square.className = `square ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
+            square.dataset.row = row;
+            square.dataset.col = col;
+            if (selectedPiece && selectedPiece.row === row && selectedPiece.col === col) {
+              square.classList.add('selected');
+            }
+            if (validMoves.some(move => move.row === row && move.col === col)) {
+              square.classList.add('valid-move');
+            }
+            square.textContent = board[row][col];
+            square.addEventListener('click', () => handleSquareClick(row, col));
+            boardElement.appendChild(square);
+          }
+        }
+      }
+
+      function handleSquareClick(row, col) {
+        const piece = board[row][col];
+
+        if (!selectedPiece) {
+          if (piece && isCurrentPlayerPiece(piece)) {
+            selectedPiece = { row, col };
+            validMoves = getValidMoves(row, col);
+            renderBoard();
+          }
+          return;
         }
 
-        // Easy AI Move logic
-        function makeMove() {
-            var possibleMoves = game.legalMoves();
-            var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-            game.uglyMove(move);
-            board.position(game.fen());
+        if (selectedPiece.row === row && selectedPiece.col === col) {
+          selectedPiece = null;
+          validMoves = [];
+          renderBoard();
+          return;
         }
 
-        // Check for win condition
-        game.game_over = function() {
-            setTimeout(function() {
-                window.location.href = 'congratulations.html';
-            }, 1000);
+        const isValidMove = validMoves.some(move => move.row === row && move.col === col);
+        if (isValidMove) {
+          board[row][col] = board[selectedPiece.row][selectedPiece.col];
+          board[selectedPiece.row][selectedPiece.col] = '';
+          currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+          statusElement.textContent = `${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}'s turn`;
         }
 
-        setInterval(function() {
-            if(game.game_over()) return;
-            makeMove();
-        }, 1000);
-    </script>
+        selectedPiece = null;
+        validMoves = [];
+        renderBoard();
+      }
+
+      function isCurrentPlayerPiece(piece) {
+        const white = ['♙', '♖', '♘', '♗', '♕', '♔'];
+        const black = ['♟', '♜', '♞', '♝', '♛', '♚'];
+        return (currentPlayer === 'white' && white.includes(piece)) ||
+               (currentPlayer === 'black' && black.includes(piece));
+      }
+
+      function getValidMoves(row, col) {
+        const piece = board[row][col];
+        const moves = [];
+
+        if (piece === '♙') {
+          if (row > 0 && board[row-1][col] === '') {
+            moves.push({ row: row-1, col });
+            if (row === 6 && board[row-2][col] === '') {
+              moves.push({ row: row-2, col });
+            }
+          }
+        } else if (piece === '♟') {
+          if (row < 7 && board[row+1][col] === '') {
+            moves.push({ row: row+1, col });
+            if (row === 1 && board[row+2][col] === '') {
+              moves.push({ row: row+2, col });
+            }
+          }
+        } else if (piece === '♖' || piece === '♜') {
+          for (let c = col + 1; c < 8; c++) {
+            if (canMoveTo(row, c)) moves.push({ row, col: c });
+            if (board[row][c]) break;
+          }
+          for (let c = col - 1; c >= 0; c--) {
+            if (canMoveTo(row, c)) moves.push({ row, col: c });
+            if (board[row][c]) break;
+          }
+          for (let r = row + 1; r < 8; r++) {
+            if (canMoveTo(r, col)) moves.push({ row: r, col });
+            if (board[r][col]) break;
+          }
+          for (let r = row - 1; r >= 0; r--) {
+            if (canMoveTo(r, col)) moves.push({ row: r, col });
+            if (board[r][col]) break;
+          }
+        }
+
+        return moves;
+      }
+
+      function canMoveTo(row, col) {
+        const target = board[row][col];
+        if (!target) return true;
+        const white = ['♙', '♖', '♘', '♗', '♕', '♔'];
+        const black = ['♟', '♜', '♞', '♝', '♛', '♚'];
+        return (currentPlayer === 'white' && !white.includes(target)) ||
+               (currentPlayer === 'black' && !black.includes(target));
+      }
+
+      resetButton.addEventListener('click', initGame);
+      initGame();
+    });
+  </script>
 </body>
 </html>
