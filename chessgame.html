@@ -1,194 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>JavaScript Chess Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-color: #f5f5f5;
-      margin: 0;
-      padding: 20px;
-    }
-    #chessboard {
-      display: grid;
-      grid-template-columns: repeat(8, 60px);
-      grid-template-rows: repeat(8, 60px);
-      border: 3px solid #333;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
-    .square {
-      width: 60px;
-      height: 60px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 40px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .light { background-color: #f0d9b5; }
-    .dark { background-color: #b58863; }
-    .selected { background-color: rgba(0, 255, 0, 0.5) !important; }
-    .valid-move { background-color: rgba(0, 0, 255, 0.3) !important; cursor: pointer; }
-    #status { margin-top: 20px; font-size: 1.2em; font-weight: bold; }
-    #controls { margin-top: 20px; }
-    button { padding: 8px 16px; font-size: 1em; cursor: pointer; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Chess Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #chessboard {
+            display: grid;
+            grid-template-columns: repeat(8, 60px);
+            grid-template-rows: repeat(8, 60px);
+            border: 3px solid #333;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .square {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .light {
+            background-color: #f0d9b5;
+        }
+
+        .dark {
+            background-color: #b58863;
+        }
+
+        .selected {
+            background-color: rgba(0, 255, 0, 0.5) !important;
+        }
+
+        .valid-move {
+            background-color: rgba(0, 0, 255, 0.3) !important;
+            cursor: pointer;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        #controls {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 8px 16px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-  <h1>JavaScript Chess</h1>
-  <div id="chessboard"></div>
-  <div id="status">White's turn</div>
-  <div id="controls">
-    <button id="reset">New Game</button>
-  </div>
+    <h1>JavaScript Chess</h1>
+    <div id="chessboard"></div>
+    <div id="status">White's turn</div>
+    <div id="controls">
+        <button id="reset">New Game</button>
+    </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const boardElement = document.getElementById('chessboard');
-      const statusElement = document.getElementById('status');
-      const resetButton = document.getElementById('reset');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const boardElement = document.getElementById('chessboard');
+            const statusElement = document.getElementById('status');
+            const resetButton = document.getElementById('reset');
 
-      let board = [];
-      let selectedPiece = null;
-      let currentPlayer = 'white';
-      let validMoves = [];
+            let board = [];
+            let selectedPiece = null;
+            let currentPlayer = 'white';
+            let validMoves = [];
 
-      function initGame() {
-        board = [
-          ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'],
-          ['♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'],
-          ['', '', '', '', '', '', '', ''],
-          ['', '', '', '', '', '', '', ''],
-          ['', '', '', '', '', '', '', ''],
-          ['', '', '', '', '', '', '', ''],
-          ['♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'],
-          ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖']
-        ];
-        currentPlayer = 'white';
-        selectedPiece = null;
-        validMoves = [];
-        statusElement.textContent = "White's turn";
-        renderBoard();
-      }
+            const whitePieces = ['♙', '♖', '♘', '♗', '♕', '♔'];
+            const blackPieces = ['♟', '♜', '♞', '♝', '♛', '♚'];
 
-      function renderBoard() {
-        boardElement.innerHTML = '';
-        for (let row = 0; row < 8; row++) {
-          for (let col = 0; col < 8; col++) {
-            const square = document.createElement('div');
-            square.className = `square ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
-            square.dataset.row = row;
-            square.dataset.col = col;
-            if (selectedPiece && selectedPiece.row === row && selectedPiece.col === col) {
-              square.classList.add('selected');
+            function initGame() {
+                board = [
+                    ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'],
+                    ['♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['', '', '', '', '', '', '', ''],
+                    ['♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'],
+                    ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖']
+                ];
+                currentPlayer = 'white';
+                selectedPiece = null;
+                validMoves = [];
+                statusElement.textContent = "White's turn";
+                renderBoard();
             }
-            if (validMoves.some(move => move.row === row && move.col === col)) {
-              square.classList.add('valid-move');
+
+            function renderBoard() {
+                boardElement.innerHTML = '';
+
+                for (let row = 0; row < 8; row++) {
+                    for (let col = 0; col < 8; col++) {
+                        const square = document.createElement('div');
+                        square.className = `square ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
+                        square.dataset.row = row;
+                        square.dataset.col = col;
+
+                        if (selectedPiece && selectedPiece.row === row && selectedPiece.col === col) {
+                            square.classList.add('selected');
+                        }
+
+                        if (validMoves.some(move => move.row === row && move.col === col)) {
+                            square.classList.add('valid-move');
+                        }
+
+                        square.textContent = board[row][col];
+                        square.addEventListener('click', () => handleSquareClick(row, col));
+                        boardElement.appendChild(square);
+                    }
+                }
             }
-            square.textContent = board[row][col];
-            square.addEventListener('click', () => handleSquareClick(row, col));
-            boardElement.appendChild(square);
-          }
-        }
-      }
 
-      function handleSquareClick(row, col) {
-        const piece = board[row][col];
+            function handleSquareClick(row, col) {
+                const piece = board[row][col];
 
-        if (!selectedPiece) {
-          if (piece && isCurrentPlayerPiece(piece)) {
-            selectedPiece = { row, col };
-            validMoves = getValidMoves(row, col);
-            renderBoard();
-          }
-          return;
-        }
+                if (!selectedPiece) {
+                    if (piece && isCurrentPlayerPiece(piece)) {
+                        selectedPiece = { row, col };
+                        validMoves = getValidMoves(row, col);
+                        renderBoard();
+                    }
+                    return;
+                }
 
-        if (selectedPiece.row === row && selectedPiece.col === col) {
-          selectedPiece = null;
-          validMoves = [];
-          renderBoard();
-          return;
-        }
+                if (selectedPiece.row === row && selectedPiece.col === col) {
+                    selectedPiece = null;
+                    validMoves = [];
+                    renderBoard();
+                    return;
+                }
 
-        const isValidMove = validMoves.some(move => move.row === row && move.col === col);
-        if (isValidMove) {
-          board[row][col] = board[selectedPiece.row][selectedPiece.col];
-          board[selectedPiece.row][selectedPiece.col] = '';
-          currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
-          statusElement.textContent = `${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}'s turn`;
-        }
+                const isValidMove = validMoves.some(move => move.row === row && move.col === col);
 
-        selectedPiece = null;
-        validMoves = [];
-        renderBoard();
-      }
+                if (isValidMove) {
+                    board[row][col] = board[selectedPiece.row][selectedPiece.col];
+                    board[selectedPiece.row][selectedPiece.col] = '';
 
-      function isCurrentPlayerPiece(piece) {
-        const white = ['♙', '♖', '♘', '♗', '♕', '♔'];
-        const black = ['♟', '♜', '♞', '♝', '♛', '♚'];
-        return (currentPlayer === 'white' && white.includes(piece)) ||
-               (currentPlayer === 'black' && black.includes(piece));
-      }
+                    currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+                    selectedPiece = null;
+                    validMoves = [];
+                    renderBoard();
+                    statusElement.textContent = `${capitalize(currentPlayer)}'s turn`;
 
-      function getValidMoves(row, col) {
-        const piece = board[row][col];
-        const moves = [];
-
-        if (piece === '♙') {
-          if (row > 0 && board[row-1][col] === '') {
-            moves.push({ row: row-1, col });
-            if (row === 6 && board[row-2][col] === '') {
-              moves.push({ row: row-2, col });
+                    if (currentPlayer === 'black') {
+                        setTimeout(computerMove, 500);
+                    }
+                }
             }
-          }
-        } else if (piece === '♟') {
-          if (row < 7 && board[row+1][col] === '') {
-            moves.push({ row: row+1, col });
-            if (row === 1 && board[row+2][col] === '') {
-              moves.push({ row: row+2, col });
+
+            function isCurrentPlayerPiece(piece) {
+                return (currentPlayer === 'white' && whitePieces.includes(piece)) ||
+                       (currentPlayer === 'black' && blackPieces.includes(piece));
             }
-          }
-        } else if (piece === '♖' || piece === '♜') {
-          for (let c = col + 1; c < 8; c++) {
-            if (canMoveTo(row, c)) moves.push({ row, col: c });
-            if (board[row][c]) break;
-          }
-          for (let c = col - 1; c >= 0; c--) {
-            if (canMoveTo(row, c)) moves.push({ row, col: c });
-            if (board[row][c]) break;
-          }
-          for (let r = row + 1; r < 8; r++) {
-            if (canMoveTo(r, col)) moves.push({ row: r, col });
-            if (board[r][col]) break;
-          }
-          for (let r = row - 1; r >= 0; r--) {
-            if (canMoveTo(r, col)) moves.push({ row: r, col });
-            if (board[r][col]) break;
-          }
-        }
 
-        return moves;
-      }
+            function getValidMoves(row, col) {
+                const piece = board[row][col];
+                const moves = [];
 
-      function canMoveTo(row, col) {
-        const target = board[row][col];
-        if (!target) return true;
-        const white = ['♙', '♖', '♘', '♗', '♕', '♔'];
-        const black = ['♟', '♜', '♞', '♝', '♛', '♚'];
-        return (currentPlayer === 'white' && !white.includes(target)) ||
-               (currentPlayer === 'black' && !black.includes(target));
-      }
+                if (piece === '♙') {
+                    if (row > 0 && board[row-1][col] === '') {
+                        moves.push({ row: row-1, col });
+                        if (row === 6 && board[row-2][col] === '') {
+                            moves.push({ row: row-2, col });
+                        }
+                    }
+                } else if (piece === '♟') {
+                    if (row < 7 && board[row+1][col] === '') {
+                        moves.push({ row: row+1, col });
+                        if (row === 1 && board[row+2][col] === '') {
+                            moves.push({ row: row+2, col });
+                        }
+                    }
+                } else if (piece === '♖' || piece === '♜') {
+                    for (let c = 0; c < 8; c++) if (c !== col) moves.push({ row, col: c });
+                    for (let r = 0; r < 8; r++) if (r !== row) moves.push({ row: r, col });
+                } else if (piece === '♗' || piece === '♝') {
+                    for (let d = 1; d < 8; d++) {
+                        if (row+d < 8 && col+d < 8) moves.push({ row: row+d, col: col+d });
+                        if (row-d >= 0 && col-d >= 0) moves.push({ row: row-d, col: col-d });
+                        if (row+d < 8 && col-d >= 0) moves.push({ row: row+d, col: col-d });
+                        if (row-d >= 0 && col+d < 8) moves.push({ row: row-d, col: col+d });
+                    }
+                }
 
-      resetButton.addEventListener('click', initGame);
-      initGame();
-    });
-  </script>
+                return moves.filter(move => {
+                    const target = board[move.row][move.col];
+                    return !target || !isCurrentPlayerPiece(target);
+                });
+            }
+
+            function computerMove() {
+                let moves = [];
+
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
+                        if (blackPieces.includes(board[r][c])) {
+                            const moveList = getValidMoves(r, c);
+                            moveList.forEach(m => {
+                                moves.push({ from: { row: r, col: c }, to: m });
+                            });
+                        }
+                    }
+                }
+
+                if (moves.length === 0) return;
+                const move = moves[Math.floor(Math.random() * moves.length)];
+                board[move.to.row][move.to.col] = board[move.from.row][move.from.col];
+                board[move.from.row][move.from.col] = '';
+
+                currentPlayer = 'white';
+                renderBoard();
+                statusElement.textContent = "White's turn";
+            }
+
+            function capitalize(str) {
+                return str.charAt(0).toUpperCase() + str.slice(1);
+            }
+
+            resetButton.addEventListener('click', initGame);
+
+            initGame();
+        });
+    </script>
 </body>
 </html>
