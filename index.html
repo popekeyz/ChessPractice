@@ -1,25 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Chess Game</title>
+    <title>Simple Chess</title>
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
-        }
-        
         #chessboard {
             display: grid;
             grid-template-columns: repeat(8, 60px);
             grid-template-rows: repeat(8, 60px);
+            width: 480px;
+            height: 480px;
             border: 2px solid #333;
         }
-        
         .square {
             width: 60px;
             height: 60px;
@@ -29,27 +20,88 @@
             font-size: 40px;
             cursor: pointer;
         }
-        
-        .white {
-            background-color: #f0d9b5;
-        }
-        
-        .black {
-            background-color: #b58863;
-        }
-        
-        .selected {
-            background-color: rgba(0, 255, 0, 0.5);
-        }
-        
-        .possible-move {
-            background-color: rgba(0, 0, 255, 0.3);
-        }
+        .white { background-color: #f0d9b5; }
+        .black { background-color: #b58863; }
+        .selected { background-color: rgba(0, 255, 0, 0.5); }
+        .valid-move { background-color: rgba(0, 0, 255, 0.3); }
     </style>
 </head>
 <body>
     <div id="chessboard"></div>
-    
-    <script src="chess.js"></script>
+    <script>
+        // SIMPLE WORKING CHESS IMPLEMENTATION
+        document.addEventListener('DOMContentLoaded', function() {
+            const board = document.getElementById('chessboard');
+            let selectedPiece = null;
+            let currentPlayer = 'white';
+            
+            // Initialize board
+            function initBoard() {
+                const pieces = [
+                    '♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜',
+                    '♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟',
+                    '', '', '', '', '', '', '', '',
+                    '', '', '', '', '', '', '', '',
+                    '', '', '', '', '', '', '', '',
+                    '', '', '', '', '', '', '', '',
+                    '♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙',
+                    '♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖'
+                ];
+                
+                board.innerHTML = '';
+                for (let i = 0; i < 64; i++) {
+                    const square = document.createElement('div');
+                    square.className = `square ${Math.floor(i/8) % 2 === i % 2 ? 'white' : 'black'}`;
+                    square.dataset.index = i;
+                    square.textContent = pieces[i];
+                    square.addEventListener('click', () => handleClick(i));
+                    board.appendChild(square);
+                }
+            }
+            
+            // Handle square clicks
+            function handleClick(index) {
+                const square = board.children[index];
+                const piece = square.textContent;
+                
+                // If no piece selected and clicked square has a piece of current player's color
+                if (!selectedPiece && isCurrentPlayerPiece(piece)) {
+                    selectedPiece = index;
+                    square.classList.add('selected');
+                    return;
+                }
+                
+                // If piece already selected
+                if (selectedPiece !== null) {
+                    // If clicking on same piece, deselect
+                    if (selectedPiece === index) {
+                        board.children[selectedPiece].classList.remove('selected');
+                        selectedPiece = null;
+                        return;
+                    }
+                    
+                    // Simple move validation (allow any move for now)
+                    board.children[index].textContent = board.children[selectedPiece].textContent;
+                    board.children[selectedPiece].textContent = '';
+                    board.children[selectedPiece].classList.remove('selected');
+                    
+                    // Switch player
+                    currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+                    selectedPiece = null;
+                }
+            }
+            
+            // Check if piece belongs to current player
+            function isCurrentPlayerPiece(piece) {
+                const whitePieces = ['♙', '♖', '♘', '♗', '♕', '♔'];
+                const blackPieces = ['♟', '♜', '♞', '♝', '♛', '♚'];
+                return (currentPlayer === 'white' && whitePieces.includes(piece)) ||
+                       (currentPlayer === 'black' && blackPieces.includes(piece));
+            }
+            
+            // Start the game
+            initBoard();
+        });
+    </script>
 </body>
 </html>
