@@ -1,0 +1,81 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to right, #f9c74f, #f9a825);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.welcome-page {
+    text-align: center;
+}
+
+.flashy-text {
+    font-size: 3em;
+    animation: flash 1s infinite alternate;
+    color: white;
+}
+
+@keyframes flash {
+    0% {
+        color: #ff6347;
+    }
+    100% {
+        color: #4b9cd3;
+    }
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    margin-top: 20px;
+    background-color: #ff6347;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #4b9cd3;
+}
+
+.ready-page {
+    text-align: center;
+    margin-top: 20%;
+}
+
+.congratulations-page {
+    text-align: center;
+    background-color: #f9c74f;
+    padding: 50px;
+}
+
+.confetti-animation {
+    /* This can be a fun confetti animation using libraries or CSS effects */
+    animation: confetti 3s ease-in-out infinite;
+}
+
+@keyframes confetti {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+button {
+    padding: 15px 30px;
+    font-size: 1.2em;
+    background-color: #4b9cd3;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+button:hover {
+    background-color: #ff6347;
+}
