@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chess.js@0.10.2/dist/chess.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Let’s Play Chess!</h1>
+        </header>
+
+        <section class="game">
+            <div id="board1" style="width: 400px"></div>
+            <button onclick="startNewGame()" class="start-button">START A NEW GAME</button>
+        </section>
+    </div>
+
+    <script>
+        var board = Chessboard('board1', {
+            draggable: true,
+            dropOffBoard: 'trash',
+            sparePieces: true
+        });
+        var game = new Chess();
+
+        board.start();
+
+        function startNewGame() {
+            game.reset();
+            board.start();
+        }
+
+        // Easy AI Move logic
+        function makeMove() {
+            var possibleMoves = game.legalMoves();
+            var move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+            game.uglyMove(move);
+            board.position(game.fen());
+        }
+
+        // Check for win condition
+        game.game_over = function() {
+            setTimeout(function() {
+                window.location.href = 'congratulations.html';
+            }, 1000);
+        }
+
+        setInterval(function() {
+            if(game.game_over()) return;
+            makeMove();
+        }, 1000);
+    </script>
+</body>
+</html>
