@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Game - Play Against the Computer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chess.js@0.10.0/dist/chess.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="board1"></div>
+    <button id="resetButton">Reset Game</button>
+
+    <script>
+        const board = Chessboard('board1', {
+            draggable: true,
+            dropOffBoard: 'trash',
+            sparePieces: true
+        });
+
+        // Simple Chess.js integration for computer move at easy level
+        const game = new Chess();
+        function makeBestMove() {
+            const bestMove = getBestMove(game);
+            game.ugly_move(bestMove);
+            board.position(game.fen());
+        }
+
+        function getBestMove(game) {
+            // Simulate an easy AI opponent
+            const possibleMoves = game.legal_moves();
+            const randomIndex = Math.floor(Math.random() * possibleMoves.length);
+            return possibleMoves[randomIndex];
+        }
+
+        board.position(game.fen());
+
+        document.getElementById('resetButton').addEventListener('click', () => {
+            game.reset();
+            board.position(game.fen());
+        });
+
+        // Trigger computer move after user plays
+        board.on('move', (oldPos, newPos) => {
+            setTimeout(makeBestMove, 500);
+        });
+    </script>
+</body>
+</html>
